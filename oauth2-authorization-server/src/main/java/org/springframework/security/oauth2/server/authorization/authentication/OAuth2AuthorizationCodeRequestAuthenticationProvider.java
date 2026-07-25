@@ -147,8 +147,14 @@ public final class OAuth2AuthorizationCodeRequestAuthenticationProvider implemen
 			}
 
 			OAuth2AuthorizationRequest authorizationRequest = pushedAuthorization
-				.getAttribute(OAuth2AuthorizationRequest.class.getName());
-
+			        .getAttribute(OAuth2AuthorizationRequest.class.getName());
+			
+			if (authorizationRequest == null) {
+			    throwError(OAuth2ErrorCodes.INVALID_REQUEST,
+				OAuth2ParameterNames.REQUEST_URI,
+				authorizationCodeRequestAuthentication,
+				null);
+			}
 			if (!authorizationCodeRequestAuthentication.getClientId().equals(authorizationRequest.getClientId())) {
 				throwError(OAuth2ErrorCodes.INVALID_REQUEST, OAuth2ParameterNames.CLIENT_ID,
 						authorizationCodeRequestAuthentication, null);
