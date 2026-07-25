@@ -227,6 +227,14 @@ public final class OAuth2AuthorizationCodeRequestAuthenticationProvider implemen
 		// ---------------
 
 		Authentication principal = (Authentication) authorizationCodeRequestAuthentication.getPrincipal();
+		if (principal == null) {
+		    throwError(
+		        OAuth2ErrorCodes.INVALID_REQUEST,
+		        OAuth2ParameterNames.CLIENT_ID,
+		        authorizationCodeRequestAuthentication,
+		        registeredClient
+		    );
+		}
 		if (!isPrincipalAuthenticated(principal)) {
 			if (promptValues.contains(OidcPrompt.NONE)) {
 				// Return an error instead of displaying the login page (via the
