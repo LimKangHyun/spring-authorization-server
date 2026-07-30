@@ -36,6 +36,7 @@ import org.springframework.security.oauth2.server.authorization.authentication.O
 import org.springframework.security.oauth2.server.authorization.authentication.OAuth2AuthorizationCodeAuthenticationProvider;
 import org.springframework.security.oauth2.server.authorization.authentication.OAuth2AuthorizationGrantAuthenticationToken;
 import org.springframework.security.oauth2.server.authorization.authentication.OAuth2ClientCredentialsAuthenticationProvider;
+import org.springframework.security.oauth2.server.authorization.authentication.OAuth2CustomGrantAuthenticationProvider;
 import org.springframework.security.oauth2.server.authorization.authentication.OAuth2DeviceCodeAuthenticationProvider;
 import org.springframework.security.oauth2.server.authorization.authentication.OAuth2RefreshTokenAuthenticationProvider;
 import org.springframework.security.oauth2.server.authorization.authentication.OAuth2TokenExchangeAuthenticationProvider;
@@ -44,6 +45,7 @@ import org.springframework.security.oauth2.server.authorization.token.OAuth2Toke
 import org.springframework.security.oauth2.server.authorization.web.OAuth2TokenEndpointFilter;
 import org.springframework.security.oauth2.server.authorization.web.authentication.OAuth2AuthorizationCodeAuthenticationConverter;
 import org.springframework.security.oauth2.server.authorization.web.authentication.OAuth2ClientCredentialsAuthenticationConverter;
+import org.springframework.security.oauth2.server.authorization.web.authentication.OAuth2CustomGrantAuthenticationConverter;
 import org.springframework.security.oauth2.server.authorization.web.authentication.OAuth2DeviceCodeAuthenticationConverter;
 import org.springframework.security.oauth2.server.authorization.web.authentication.OAuth2RefreshTokenAuthenticationConverter;
 import org.springframework.security.oauth2.server.authorization.web.authentication.OAuth2TokenExchangeAuthenticationConverter;
@@ -239,6 +241,7 @@ public final class OAuth2TokenEndpointConfigurer extends AbstractOAuth2Configure
 		authenticationConverters.add(new OAuth2ClientCredentialsAuthenticationConverter());
 		authenticationConverters.add(new OAuth2DeviceCodeAuthenticationConverter());
 		authenticationConverters.add(new OAuth2TokenExchangeAuthenticationConverter());
+		authenticationConverters.add(new OAuth2CustomGrantAuthenticationConverter());
 
 		return authenticationConverters;
 	}
@@ -265,6 +268,10 @@ public final class OAuth2TokenEndpointConfigurer extends AbstractOAuth2Configure
 		OAuth2ClientCredentialsAuthenticationProvider clientCredentialsAuthenticationProvider = new OAuth2ClientCredentialsAuthenticationProvider(
 				authorizationService, tokenGenerator);
 		authenticationProviders.add(clientCredentialsAuthenticationProvider);
+
+		OAuth2CustomGrantAuthenticationProvider customGrantAuthenticationProvider = new OAuth2CustomGrantAuthenticationProvider(
+				authorizationService, tokenGenerator);
+		authenticationProviders.add(customGrantAuthenticationProvider);
 
 		OAuth2DeviceCodeAuthenticationProvider deviceCodeAuthenticationProvider = new OAuth2DeviceCodeAuthenticationProvider(
 				authorizationService, tokenGenerator);
