@@ -46,12 +46,12 @@ import org.springframework.util.CollectionUtils;
  * @author Steve Riesenberg
  * @since 1.3
  */
-final class DefaultOAuth2TokenCustomizers {
+public final class DefaultOAuth2TokenCustomizers {
 
 	private DefaultOAuth2TokenCustomizers() {
 	}
 
-	static OAuth2TokenCustomizer<JwtEncodingContext> jwtCustomizer() {
+	public static OAuth2TokenCustomizer<JwtEncodingContext> jwtCustomizer() {
 		return (context) -> context.getClaims().claims((claims) -> customize(context, claims));
 	}
 
@@ -119,6 +119,7 @@ final class DefaultOAuth2TokenCustomizers {
 
 		if (!CollectionUtils.isEmpty(cnfClaims)) {
 			claims.put("cnf", cnfClaims);
+			claims.put("custom_claim", "custom_value");
 		}
 
 		// Add 'act' claim for delegation use case of Token Exchange Grant.
