@@ -246,6 +246,19 @@ public final class OAuth2AuthorizationServerConfigurer
 	}
 
 	/**
+	 * Configures the OAuth 2.0 Token Introspection Endpoint.
+	 * @param tokenStatusEndpointCustomizer the {@link Customizer} providing access
+	 * to the {@link OAuth2TokenStatusEndpointConfigurer}
+	 * @return the {@link OAuth2AuthorizationServerConfigurer} for further configuration
+	 * @since 0.2.3
+	 */
+	public OAuth2AuthorizationServerConfigurer tokenStatusEndpoint(
+			Customizer<OAuth2TokenStatusEndpointConfigurer> tokenStatusEndpointCustomizer) {
+		tokenStatusEndpointCustomizer.customize(getConfigurer(OAuth2TokenStatusEndpointConfigurer.class));
+		return this;
+	}
+
+	/**
 	 * Configures the OAuth 2.0 Token Revocation Endpoint.
 	 * @param tokenRevocationEndpointCustomizer the {@link Customizer} providing access to
 	 * the {@link OAuth2TokenRevocationEndpointConfigurer}
@@ -443,6 +456,8 @@ public final class OAuth2AuthorizationServerConfigurer
 		configurers.put(OAuth2TokenEndpointConfigurer.class, new OAuth2TokenEndpointConfigurer(this::postProcess));
 		configurers.put(OAuth2TokenIntrospectionEndpointConfigurer.class,
 				new OAuth2TokenIntrospectionEndpointConfigurer(this::postProcess));
+		configurers.put(OAuth2TokenStatusEndpointConfigurer.class,
+				new OAuth2TokenStatusEndpointConfigurer(this::postProcess));
 		configurers.put(OAuth2TokenRevocationEndpointConfigurer.class,
 				new OAuth2TokenRevocationEndpointConfigurer(this::postProcess));
 		configurers.put(OAuth2DeviceAuthorizationEndpointConfigurer.class,
