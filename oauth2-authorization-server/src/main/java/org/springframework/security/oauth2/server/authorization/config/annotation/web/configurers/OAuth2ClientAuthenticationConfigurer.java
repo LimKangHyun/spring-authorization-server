@@ -38,6 +38,7 @@ import org.springframework.security.oauth2.server.authorization.authentication.X
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
 import org.springframework.security.oauth2.server.authorization.web.OAuth2ClientAuthenticationFilter;
+import org.springframework.security.oauth2.server.authorization.web.OAuth2ClientAuthenticationValidationFilter;
 import org.springframework.security.oauth2.server.authorization.web.authentication.ClientSecretBasicAuthenticationConverter;
 import org.springframework.security.oauth2.server.authorization.web.authentication.ClientSecretPostAuthenticationConverter;
 import org.springframework.security.oauth2.server.authorization.web.authentication.JwtClientAssertionAuthenticationConverter;
@@ -221,6 +222,8 @@ public final class OAuth2ClientAuthenticationConfigurer extends AbstractOAuth2Co
 		AuthenticationManager authenticationManager = httpSecurity.getSharedObject(AuthenticationManager.class);
 		OAuth2ClientAuthenticationFilter clientAuthenticationFilter = new OAuth2ClientAuthenticationFilter(
 				authenticationManager, this.requestMatcher);
+		OAuth2ClientAuthenticationValidationFilter validationFilter =
+				new OAuth2ClientAuthenticationValidationFilter(this.requestMatcher);
 		List<AuthenticationConverter> authenticationConverters = createDefaultAuthenticationConverters();
 		if (!this.authenticationConverters.isEmpty()) {
 			authenticationConverters.addAll(0, this.authenticationConverters);
@@ -234,6 +237,9 @@ public final class OAuth2ClientAuthenticationConfigurer extends AbstractOAuth2Co
 		if (this.errorResponseHandler != null) {
 			clientAuthenticationFilter.setAuthenticationFailureHandler(this.errorResponseHandler);
 		}
+		httpSecurity.addFilterAfter(postProcess(validationFilter),
+				AbstractPreAuthenticatedProcessingFilter.class
+		);
 		httpSecurity.addFilterAfter(postProcess(clientAuthenticationFilter),
 				AbstractPreAuthenticatedProcessingFilter.class);
 	}
