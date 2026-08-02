@@ -102,16 +102,17 @@ public final class OAuth2TokenExchangeAuthenticationProvider implements Authenti
 	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
 		OAuth2TokenExchangeAuthenticationToken tokenExchangeAuthentication = (OAuth2TokenExchangeAuthenticationToken) authentication;
 
-		OAuth2ClientAuthenticationToken clientPrincipal = OAuth2AuthenticationProviderUtils
-			.getAuthenticatedClientElseThrowInvalidClient(tokenExchangeAuthentication);
-		RegisteredClient registeredClient = clientPrincipal.getRegisteredClient();
+		OAuth2ClientAuthenticationToken clientPrincipal =
+				OAuth2AuthenticationProviderUtils
+						.getAuthenticatedClientElseThrowInvalidClient(tokenExchangeAuthentication);
+
+		RegisteredClient registeredClient =
+				OAuth2AuthenticationProviderUtils.getRegisteredClient(
+						tokenExchangeAuthentication,
+						AuthorizationGrantType.REFRESH_TOKEN);
 
 		if (this.logger.isTraceEnabled()) {
 			this.logger.trace("Retrieved registered client");
-		}
-
-		if (!registeredClient.getAuthorizationGrantTypes().contains(AuthorizationGrantType.TOKEN_EXCHANGE)) {
-			throw new OAuth2AuthenticationException(OAuth2ErrorCodes.UNAUTHORIZED_CLIENT);
 		}
 
 		if (JWT_TOKEN_TYPE_VALUE.equals(tokenExchangeAuthentication.getRequestedTokenType())
