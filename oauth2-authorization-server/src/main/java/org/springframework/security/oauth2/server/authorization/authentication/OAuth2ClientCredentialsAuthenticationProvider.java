@@ -92,21 +92,17 @@ public final class OAuth2ClientCredentialsAuthenticationProvider implements Auth
 	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
 		OAuth2ClientCredentialsAuthenticationToken clientCredentialsAuthentication = (OAuth2ClientCredentialsAuthenticationToken) authentication;
 
-		OAuth2ClientAuthenticationToken clientPrincipal = OAuth2AuthenticationProviderUtils
-			.getAuthenticatedClientElseThrowInvalidClient(clientCredentialsAuthentication);
-		RegisteredClient registeredClient = clientPrincipal.getRegisteredClient();
+		OAuth2ClientAuthenticationToken clientPrincipal =
+				OAuth2AuthenticationProviderUtils
+						.getAuthenticatedClientElseThrowInvalidClient(clientCredentialsAuthentication);
+
+		RegisteredClient registeredClient =
+				OAuth2AuthenticationProviderUtils.getRegisteredClient(
+						clientCredentialsAuthentication,
+						AuthorizationGrantType.CLIENT_CREDENTIALS);
 
 		if (this.logger.isTraceEnabled()) {
 			this.logger.trace("Retrieved registered client");
-		}
-
-		if (!registeredClient.getAuthorizationGrantTypes().contains(AuthorizationGrantType.CLIENT_CREDENTIALS)) {
-			if (this.logger.isDebugEnabled()) {
-				this.logger.debug(LogMessage.format(
-						"Invalid request: requested grant_type is not allowed" + " for registered client '%s'",
-						registeredClient.getId()));
-			}
-			throw new OAuth2AuthenticationException(OAuth2ErrorCodes.UNAUTHORIZED_CLIENT);
 		}
 
 		OAuth2ClientCredentialsAuthenticationContext authenticationContext = OAuth2ClientCredentialsAuthenticationContext
