@@ -20,32 +20,17 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
-
 import com.nimbusds.jose.jwk.source.JWKSource;
 
-import org.springframework.context.ApplicationListener;
-import org.springframework.context.event.GenericApplicationListenerAdapter;
-import org.springframework.context.event.SmartApplicationListener;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.ExceptionHandlingConfigurer;
-import org.springframework.security.context.DelegatingApplicationListener;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.session.SessionRegistry;
-import org.springframework.security.core.session.SessionRegistryImpl;
-import org.springframework.security.oauth2.core.OAuth2Error;
-import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
 import org.springframework.security.oauth2.core.OAuth2Token;
-import org.springframework.security.oauth2.core.oidc.OidcScopes;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationConsentService;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
-import org.springframework.security.oauth2.server.authorization.authentication.OAuth2AuthorizationCodeRequestAuthenticationContext;
-import org.springframework.security.oauth2.server.authorization.authentication.OAuth2AuthorizationCodeRequestAuthenticationException;
-import org.springframework.security.oauth2.server.authorization.authentication.OAuth2AuthorizationCodeRequestAuthenticationToken;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenGenerator;
@@ -314,53 +299,12 @@ public final class OAuth2AuthorizationServerConfigurer
 	@Override
 	public void init(HttpSecurity httpSecurity) throws Exception {
 		AuthorizationServerSettings authorizationServerSettings = OAuth2ConfigurerUtils
-			.getAuthorizationServerSettings(httpSecurity);
+				.getAuthorizationServerSettings(httpSecurity);
+
 		validateAuthorizationServerSettings(authorizationServerSettings);
 
-		if (isOidcEnabled()) {
-			// Add OpenID Connect session tracking capabilities.
-			initSessionRegistry(httpSecurity);
-			SessionRegistry sessionRegistry = httpSecurity.getSharedObject(SessionRegistry.class);
-			OAuth2AuthorizationEndpointConfigurer authorizationEndpointConfigurer = getConfigurer(
-					OAuth2AuthorizationEndpointConfigurer.class);
-			authorizationEndpointConfigurer.setSessionAuthenticationStrategy((authentication, request, response) -> {
-				if (authentication instanceof OAuth2AuthorizationCodeRequestAuthenticationToken authorizationCodeRequestAuthentication) {
-					if (authorizationCodeRequestAuthentication.getScopes().contains(OidcScopes.OPENID)) {
-						if (sessionRegistry.getSessionInformation(request.getSession().getId()) == null) {
-							sessionRegistry.registerNewSession(request.getSession().getId(),
-									((Authentication) authorizationCodeRequestAuthentication.getPrincipal())
-										.getPrincipal());
-						}
-					}
-				}
-			});
-		}
-		else {
-			// OpenID Connect is disabled.
-			// Add an authentication validator that rejects authentication requests.
-			Consumer<OAuth2AuthorizationCodeRequestAuthenticationContext> oidcAuthenticationRequestValidator = (
-					authenticationContext) -> {
-				OAuth2AuthorizationCodeRequestAuthenticationToken authorizationCodeRequestAuthentication = authenticationContext
-					.getAuthentication();
-				if (authorizationCodeRequestAuthentication.getScopes().contains(OidcScopes.OPENID)) {
-					OAuth2Error error = new OAuth2Error(OAuth2ErrorCodes.INVALID_SCOPE,
-							"OpenID Connect 1.0 authentication requests are restricted.",
-							"https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.2.1");
-					throw new OAuth2AuthorizationCodeRequestAuthenticationException(error,
-							authorizationCodeRequestAuthentication);
-				}
-			};
-			OAuth2AuthorizationEndpointConfigurer authorizationEndpointConfigurer = getConfigurer(
-					OAuth2AuthorizationEndpointConfigurer.class);
-			authorizationEndpointConfigurer
-				.addAuthorizationCodeRequestAuthenticationValidator(oidcAuthenticationRequestValidator);
-			OAuth2PushedAuthorizationRequestEndpointConfigurer pushedAuthorizationRequestEndpointConfigurer = getConfigurer(
-					OAuth2PushedAuthorizationRequestEndpointConfigurer.class);
-			if (pushedAuthorizationRequestEndpointConfigurer != null) {
-				pushedAuthorizationRequestEndpointConfigurer
-					.addAuthorizationCodeRequestAuthenticationValidator(oidcAuthenticationRequestValidator);
-			}
-		}
+		new OAuth2AuthorizationServerConfigurerOidcSupport()
+				.init(httpSecurity, this);
 
 		List<RequestMatcher> requestMatchers = new ArrayList<>();
 		this.configurers.values().forEach((configurer) -> {
@@ -428,10 +372,6 @@ public final class OAuth2AuthorizationServerConfigurer
 		}
 	}
 
-	private boolean isOidcEnabled() {
-		return getConfigurer(OidcConfigurer.class) != null;
-	}
-
 	private Map<Class<? extends AbstractOAuth2Configurer>, AbstractOAuth2Configurer> createConfigurers() {
 		Map<Class<? extends AbstractOAuth2Configurer>, AbstractOAuth2Configurer> configurers = new LinkedHashMap<>();
 		configurers.put(OAuth2ClientAuthenticationConfigurer.class,
@@ -453,7 +393,7 @@ public final class OAuth2AuthorizationServerConfigurer
 	}
 
 	@SuppressWarnings("unchecked")
-	private <T> T getConfigurer(Class<T> type) {
+	<T> T getConfigurer(Class<T> type) {
 		return (T) this.configurers.get(type);
 	}
 
@@ -481,26 +421,6 @@ public final class OAuth2AuthorizationServerConfigurer
 				throw new IllegalArgumentException("issuer cannot contain query or fragment component");
 			}
 		}
-	}
-
-	private static void initSessionRegistry(HttpSecurity httpSecurity) {
-		SessionRegistry sessionRegistry = OAuth2ConfigurerUtils.getOptionalBean(httpSecurity, SessionRegistry.class);
-		if (sessionRegistry == null) {
-			sessionRegistry = new SessionRegistryImpl();
-			registerDelegateApplicationListener(httpSecurity, (SessionRegistryImpl) sessionRegistry);
-		}
-		httpSecurity.setSharedObject(SessionRegistry.class, sessionRegistry);
-	}
-
-	private static void registerDelegateApplicationListener(HttpSecurity httpSecurity,
-			ApplicationListener<?> delegate) {
-		DelegatingApplicationListener delegatingApplicationListener = OAuth2ConfigurerUtils
-			.getOptionalBean(httpSecurity, DelegatingApplicationListener.class);
-		if (delegatingApplicationListener == null) {
-			return;
-		}
-		SmartApplicationListener smartListener = new GenericApplicationListenerAdapter(delegate);
-		delegatingApplicationListener.addListener(smartListener);
 	}
 
 }
