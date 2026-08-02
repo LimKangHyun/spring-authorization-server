@@ -360,30 +360,12 @@ public final class AuthorizationServerSettings extends AbstractSettings {
 		@Override
 		public AuthorizationServerSettings build() {
 			AuthorizationServerSettings authorizationServerSettings = new AuthorizationServerSettings(getSettings());
-
 			if (authorizationServerSettings.getIssuer() != null
 					&& authorizationServerSettings.isMultipleIssuersAllowed()) {
 				throw new IllegalArgumentException("The issuer identifier (" + authorizationServerSettings.getIssuer()
 						+ ") cannot be set when isMultipleIssuersAllowed() is true.");
 			}
-
-			validateEndpoint(authorizationServerSettings.getAuthorizationEndpoint());
-			validateEndpoint(authorizationServerSettings.getPushedAuthorizationRequestEndpoint());
-			validateEndpoint(authorizationServerSettings.getDeviceAuthorizationEndpoint());
-			validateEndpoint(authorizationServerSettings.getDeviceVerificationEndpoint());
-			validateEndpoint(authorizationServerSettings.getTokenEndpoint());
-			validateEndpoint(authorizationServerSettings.getJwkSetEndpoint());
-			validateEndpoint(authorizationServerSettings.getTokenRevocationEndpoint());
-			validateEndpoint(authorizationServerSettings.getTokenIntrospectionEndpoint());
-			validateEndpoint(authorizationServerSettings.getOidcClientRegistrationEndpoint());
-			validateEndpoint(authorizationServerSettings.getOidcUserInfoEndpoint());
-			validateEndpoint(authorizationServerSettings.getOidcLogoutEndpoint());
-
 			return authorizationServerSettings;
-		}
-
-		private static void validateEndpoint(String endpoint) {
-			Assert.hasText(endpoint, "endpoint cannot be empty");
 		}
 
 	}
