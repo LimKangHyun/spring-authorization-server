@@ -35,7 +35,12 @@ public final class AuthorizationServerContextHolder {
 	 * @return the {@link AuthorizationServerContext}
 	 */
 	public static AuthorizationServerContext getContext() {
-		return holder.get();
+		AuthorizationServerContext context = holder.get();
+		if (context == null) {
+			throw new IllegalStateException(
+					"AuthorizationServerContext is missing");
+		}
+		return context;
 	}
 
 	/**
