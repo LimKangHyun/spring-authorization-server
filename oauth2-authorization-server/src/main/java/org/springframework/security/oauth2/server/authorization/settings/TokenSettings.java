@@ -53,7 +53,7 @@ public final class TokenSettings extends AbstractSettings {
 	 * Returns the time-to-live for an access token. The default is 5 minutes.
 	 * @return the time-to-live for an access token
 	 */
-	public Duration getAccessTokenTimeToLive() {
+	public Duration getAccessTokenLifetime() {
 		return getSetting(ConfigurationSettingNames.Token.ACCESS_TOKEN_TIME_TO_LIVE);
 	}
 
@@ -125,7 +125,7 @@ public final class TokenSettings extends AbstractSettings {
 	 */
 	public static Builder builder() {
 		return new Builder().authorizationCodeTimeToLive(Duration.ofMinutes(5))
-			.accessTokenTimeToLive(Duration.ofMinutes(5))
+			.accessTokenLifetime(Duration.ofMinutes(5))
 			.accessTokenFormat(OAuth2TokenFormat.SELF_CONTAINED)
 			.deviceCodeTimeToLive(Duration.ofMinutes(5))
 			.reuseRefreshTokens(true)
@@ -174,7 +174,7 @@ public final class TokenSettings extends AbstractSettings {
 		 * @param accessTokenTimeToLive the time-to-live for an access token
 		 * @return the {@link Builder} for further configuration
 		 */
-		public Builder accessTokenTimeToLive(Duration accessTokenTimeToLive) {
+		public Builder accessTokenLifetime(Duration accessTokenTimeToLive) {
 			Assert.notNull(accessTokenTimeToLive, "accessTokenTimeToLive cannot be null");
 			Assert.isTrue(accessTokenTimeToLive.getSeconds() > 0,
 					"accessTokenTimeToLive must be greater than Duration.ZERO");
