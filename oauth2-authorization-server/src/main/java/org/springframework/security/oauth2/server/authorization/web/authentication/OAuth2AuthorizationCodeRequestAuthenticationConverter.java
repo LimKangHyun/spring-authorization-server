@@ -90,26 +90,8 @@ public final class OAuth2AuthorizationCodeRequestAuthenticationConverter impleme
 		// request_uri (OPTIONAL) - provided if an authorization request was previously
 		// pushed (RFC 9126 OAuth 2.0 Pushed Authorization Requests)
 		String requestUri = parameters.getFirst(OAuth2ParameterNames.REQUEST_URI);
-		if (StringUtils.hasText(requestUri)) {
-			if (pushedAuthorizationRequest) {
-				throwError(OAuth2ErrorCodes.INVALID_REQUEST, OAuth2ParameterNames.REQUEST_URI);
-			}
-			else if (parameters.get(OAuth2ParameterNames.REQUEST_URI).size() != 1) {
-				// Authorization Request
-				throwError(OAuth2ErrorCodes.INVALID_REQUEST, OAuth2ParameterNames.REQUEST_URI);
-			}
-		}
-
-		if (!StringUtils.hasText(requestUri)) {
-			// response_type (REQUIRED)
-			String responseType = parameters.getFirst(OAuth2ParameterNames.RESPONSE_TYPE);
-			if (!StringUtils.hasText(responseType) || parameters.get(OAuth2ParameterNames.RESPONSE_TYPE).size() != 1) {
-				throwError(OAuth2ErrorCodes.INVALID_REQUEST, OAuth2ParameterNames.RESPONSE_TYPE);
-			}
-			else if (!responseType.equals(OAuth2AuthorizationResponseType.CODE.getValue())) {
-				throwError(OAuth2ErrorCodes.UNSUPPORTED_RESPONSE_TYPE, OAuth2ParameterNames.RESPONSE_TYPE);
-			}
-		}
+		validateRequestUri(parameters, pushedAuthorizationRequest);
+		validateResponseType(parameters, requestUri);
 
 		String authorizationUri = request.getRequestURL().toString();
 
@@ -189,11 +171,11 @@ public final class OAuth2AuthorizationCodeRequestAuthenticationConverter impleme
 	private boolean isPushedAuthorizationRequest(HttpServletRequest request) {
 		AuthorizationServerContext authorizationServerContext = AuthorizationServerContextHolder.getContext();
 		AuthorizationServerSettings authorizationServerSettings = authorizationServerContext
-			.getAuthorizationServerSettings();
+				.getAuthorizationServerSettings();
 		return request.getRequestURL()
-			.toString()
-			.toLowerCase(Locale.ROOT)
-			.endsWith(authorizationServerSettings.getPushedAuthorizationRequestEndpoint().toLowerCase(Locale.ROOT));
+				.toString()
+				.toLowerCase(Locale.ROOT)
+				.endsWith(authorizationServerSettings.getPushedAuthorizationRequestEndpoint().toLowerCase(Locale.ROOT));
 	}
 
 	private static RequestMatcher createDefaultRequestMatcher() {
@@ -212,6 +194,47 @@ public final class OAuth2AuthorizationCodeRequestAuthenticationConverter impleme
 	private static void throwError(String errorCode, String parameterName, String errorUri) {
 		OAuth2Error error = new OAuth2Error(errorCode, "OAuth 2.0 Parameter: " + parameterName, errorUri);
 		throw new OAuth2AuthorizationCodeRequestAuthenticationException(error, null);
+	}
+
+	private void validateRequestUri(
+			MultiValueMap<String, String> parameters,
+			boolean pushedAuthorizationRequest) {
+
+		String requestUri = parameters.getFirst(OAuth2ParameterNames.REQUEST_URI);
+
+		if (!StringUtils.hasText(requestUri)) {
+			return;
+		}
+
+		if (pushedAuthorizationRequest) {
+			throwError(OAuth2ErrorCodes.INVALID_REQUEST, OAuth2ParameterNames.REQUEST_URI);
+		}
+
+		if (parameters.get(OAuth2ParameterNames.REQUEST_URI).size() != 1) {
+			throwError(OAuth2ErrorCodes.INVALID_REQUEST, OAuth2ParameterNames.REQUEST_URI);
+		}
+	}
+
+	private void validateResponseType(
+			MultiValueMap<String, String> parameters,
+			String requestUri) {
+
+		if (StringUtils.hasText(requestUri)) {
+			return;
+		}
+
+		String responseType = parameters.getFirst(OAuth2ParameterNames.RESPONSE_TYPE);
+
+		if (!StringUtils.hasText(responseType)
+				|| parameters.get(OAuth2ParameterNames.RESPONSE_TYPE).size() != 1) {
+			throwError(OAuth2ErrorCodes.INVALID_REQUEST,
+					OAuth2ParameterNames.RESPONSE_TYPE);
+		}
+
+		if (!responseType.equals(OAuth2AuthorizationResponseType.CODE.getValue())) {
+			throwError(OAuth2ErrorCodes.UNSUPPORTED_RESPONSE_TYPE,
+					OAuth2ParameterNames.RESPONSE_TYPE);
+		}
 	}
 
 }
