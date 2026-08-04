@@ -165,7 +165,7 @@ public final class ClientSecretAuthenticationProvider implements AuthenticationP
 
 	private static void throwInvalidClient(String parameterName) {
 		OAuth2Error error = new OAuth2Error(OAuth2ErrorCodes.INVALID_CLIENT,
-				"Client authentication failed: " + parameterName, ERROR_URI);
+				"Client authentication process failed: " + parameterName, ERROR_URI);
 		throw new OAuth2AuthenticationException(error);
 	}
 
