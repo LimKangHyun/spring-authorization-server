@@ -54,7 +54,7 @@ public final class JwtClientAssertionAuthenticationProvider implements Authentic
 
 	private static final String ERROR_URI = "https://datatracker.ietf.org/doc/html/rfc6749#section-3.2.1";
 
-	private static final ClientAuthenticationMethod JWT_CLIENT_ASSERTION_AUTHENTICATION_METHOD = new ClientAuthenticationMethod(
+	private static final ClientAuthenticationMethod JWT_CLIENT_ASSERT_AUTHENTICATION_METHOD = new ClientAuthenticationMethod(
 			"urn:ietf:params:oauth:client-assertion-type:jwt-bearer");
 
 	private final Log logger = LogFactory.getLog(getClass());
@@ -84,7 +84,7 @@ public final class JwtClientAssertionAuthenticationProvider implements Authentic
 	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
 		OAuth2ClientAuthenticationToken clientAuthentication = (OAuth2ClientAuthenticationToken) authentication;
 
-		if (!JWT_CLIENT_ASSERTION_AUTHENTICATION_METHOD.equals(clientAuthentication.getClientAuthenticationMethod())) {
+		if (!JWT_CLIENT_ASSERT_AUTHENTICATION_METHOD.equals(clientAuthentication.getClientAuthenticationMethod())) {
 			return null;
 		}
 
