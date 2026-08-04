@@ -103,7 +103,7 @@ public final class OAuth2TokenIntrospectionAuthenticationProvider implements Aut
 			.getToken(tokenIntrospectionAuthentication.getToken());
 		if (!authorizedToken.isActive()) {
 			if (this.logger.isTraceEnabled()) {
-				this.logger.trace("Did not introspect token since not active");
+				this.logger.trace("Did not introspect token since not active!");
 			}
 			return new OAuth2TokenIntrospectionAuthenticationToken(tokenIntrospectionAuthentication.getToken(),
 					clientPrincipal, OAuth2TokenIntrospection.builder().build());
