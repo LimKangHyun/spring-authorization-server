@@ -192,19 +192,7 @@ public final class ClientSettings extends AbstractSettings {
 		 */
 		@Override
 		public ClientSettings build() {
-			validateSettings();
 			return new ClientSettings(getSettings());
-		}
-
-		private void validateSettings() {
-			Boolean requireProofKey = (Boolean) getSettings()
-					.get(ConfigurationSettingNames.Client.REQUIRE_PROOF_KEY);
-
-			if (Boolean.TRUE.equals(requireProofKey)
-					&& getSettings().get(ConfigurationSettingNames.Client.JWK_SET_URL) == null) {
-				throw new IllegalArgumentException(
-						"Proof key client requires JWK Set URL");
-			}
 		}
 
 	}
