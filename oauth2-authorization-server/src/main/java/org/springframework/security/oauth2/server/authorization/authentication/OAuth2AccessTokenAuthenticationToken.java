@@ -29,7 +29,10 @@ import org.springframework.util.Assert;
 
 /**
  * An {@link Authentication} implementation used when issuing an OAuth 2.0 Access Token
- * and (optional) Refresh Token.
+ * and an optional Refresh Token.
+ *
+ * This token contains the authenticated client principal, generated tokens, and any
+ * additional parameters returned during the token endpoint authentication flow.
  *
  * @author Joe Grandja
  * @author Madhu Bhat
