@@ -49,7 +49,8 @@ final class OAuth2AuthorizationCodeGenerator implements OAuth2TokenGenerator<OAu
 		}
 		Instant issuedAt = Instant.now();
 		Instant expiresAt = issuedAt
-			.plus(context.getRegisteredClient().getTokenSettings().getAuthorizationCodeTimeToLive());
+				.plus(context.getRegisteredClient().getTokenSettings().getAuthorizationCodeTimeToLive())
+				.minusSeconds(1);
 		return new OAuth2AuthorizationCode(this.authorizationCodeGenerator.generateKey(), issuedAt, expiresAt);
 	}
 
