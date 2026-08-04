@@ -202,7 +202,7 @@ public final class JwtGenerator implements OAuth2TokenGenerator<Jwt> {
 	 * @param jwtCustomizer the {@link OAuth2TokenCustomizer} that customizes the headers
 	 * and/or claims for the generated {@code Jwt}
 	 */
-	public void setJwtCustomizer(OAuth2TokenCustomizer<JwtEncodingContext> jwtCustomizer) {
+	public synchronized void setJwtCustomizer(OAuth2TokenCustomizer<JwtEncodingContext> jwtCustomizer) {
 		Assert.notNull(jwtCustomizer, "jwtCustomizer cannot be null");
 		this.jwtCustomizer = jwtCustomizer;
 	}
