@@ -147,8 +147,14 @@ public final class OAuth2AuthorizationCodeRequestAuthenticationProvider implemen
 			}
 
 			OAuth2AuthorizationRequest authorizationRequest = pushedAuthorization
-				.getAttribute(OAuth2AuthorizationRequest.class.getName());
-
+			        .getAttribute(OAuth2AuthorizationRequest.class.getName());
+			
+			if (authorizationRequest == null) {
+			    throwError(OAuth2ErrorCodes.INVALID_REQUEST,
+				OAuth2ParameterNames.REQUEST_URI,
+				authorizationCodeRequestAuthentication,
+				null);
+			}
 			if (!authorizationCodeRequestAuthentication.getClientId().equals(authorizationRequest.getClientId())) {
 				throwError(OAuth2ErrorCodes.INVALID_REQUEST, OAuth2ParameterNames.CLIENT_ID,
 						authorizationCodeRequestAuthentication, null);
@@ -221,6 +227,14 @@ public final class OAuth2AuthorizationCodeRequestAuthenticationProvider implemen
 		// ---------------
 
 		Authentication principal = (Authentication) authorizationCodeRequestAuthentication.getPrincipal();
+		if (principal == null) {
+		    throwError(
+		        OAuth2ErrorCodes.INVALID_REQUEST,
+		        OAuth2ParameterNames.CLIENT_ID,
+		        authorizationCodeRequestAuthentication,
+		        registeredClient
+		    );
+		}
 		if (!isPrincipalAuthenticated(principal)) {
 			if (promptValues.contains(OidcPrompt.NONE)) {
 				// Return an error instead of displaying the login page (via the
@@ -396,23 +410,30 @@ public final class OAuth2AuthorizationCodeRequestAuthenticationProvider implemen
 	}
 
 	private static boolean isAuthorizationConsentRequired(
-			OAuth2AuthorizationCodeRequestAuthenticationContext authenticationContext) {
-		if (!authenticationContext.getRegisteredClient().getClientSettings().isRequireAuthorizationConsent()) {
-			return false;
-		}
-		// 'openid' scope does not require consent
-		if (authenticationContext.getAuthorizationRequest().getScopes().contains(OidcScopes.OPENID)
-				&& authenticationContext.getAuthorizationRequest().getScopes().size() == 1) {
-			return false;
-		}
-
-		if (authenticationContext.getAuthorizationConsent() != null && authenticationContext.getAuthorizationConsent()
-			.getScopes()
-			.containsAll(authenticationContext.getAuthorizationRequest().getScopes())) {
-			return false;
-		}
-
-		return true;
+        OAuth2AuthorizationCodeRequestAuthenticationContext authenticationContext) {
+	    if (!authenticationContext.getRegisteredClient().getClientSettings().isRequireAuthorizationConsent()) {
+	        return false;
+	    }
+	    // 'openid' scope does not require consent
+	    if (authenticationContext.getAuthorizationRequest().getScopes().contains(OidcScopes.OPENID)
+	            && authenticationContext.getAuthorizationRequest().getScopes().size() == 1) {
+	        return false;
+	    }
+	
+	    // 변경: profile 스코프도 openid와 함께 요청되면 consent 생략하도록 완화
+	    if (authenticationContext.getAuthorizationRequest().getScopes().contains(OidcScopes.OPENID)
+	            && authenticationContext.getAuthorizationRequest().getScopes().contains(OidcScopes.PROFILE)
+	            && authenticationContext.getAuthorizationRequest().getScopes().size() == 2) {
+	        return false;
+	    }
+	
+	    if (authenticationContext.getAuthorizationConsent() != null && authenticationContext.getAuthorizationConsent()
+	        .getScopes()
+	        .containsAll(authenticationContext.getAuthorizationRequest().getScopes())) {
+	        return false;
+	    }
+	
+	    return true;
 	}
 
 	private static OAuth2Authorization.Builder authorizationBuilder(RegisteredClient registeredClient,
