@@ -183,7 +183,7 @@ public final class OAuth2AuthorizationServerConfigurer
 	public OAuth2AuthorizationServerConfigurer authorizationServerMetadataEndpoint(
 			Customizer<OAuth2AuthorizationServerMetadataEndpointConfigurer> authorizationServerMetadataEndpointCustomizer) {
 		authorizationServerMetadataEndpointCustomizer
-			.customize(getConfigurer(OAuth2AuthorizationServerMetadataEndpointConfigurer.class));
+				.customize(getConfigurer(OAuth2AuthorizationServerMetadataEndpointConfigurer.class));
 		return this;
 	}
 
@@ -246,6 +246,19 @@ public final class OAuth2AuthorizationServerConfigurer
 	}
 
 	/**
+	 * Configures the OAuth 2.0 Token Introspection Endpoint.
+	 * @param tokenStatusEndpointCustomizer the {@link Customizer} providing access
+	 * to the {@link OAuth2TokenStatusEndpointConfigurer}
+	 * @return the {@link OAuth2AuthorizationServerConfigurer} for further configuration
+	 * @since 0.2.3
+	 */
+	public OAuth2AuthorizationServerConfigurer tokenStatusEndpoint(
+			Customizer<OAuth2TokenStatusEndpointConfigurer> tokenStatusEndpointCustomizer) {
+		tokenStatusEndpointCustomizer.customize(getConfigurer(OAuth2TokenStatusEndpointConfigurer.class));
+		return this;
+	}
+
+	/**
 	 * Configures the OAuth 2.0 Token Revocation Endpoint.
 	 * @param tokenRevocationEndpointCustomizer the {@link Customizer} providing access to
 	 * the {@link OAuth2TokenRevocationEndpointConfigurer}
@@ -268,7 +281,7 @@ public final class OAuth2AuthorizationServerConfigurer
 	public OAuth2AuthorizationServerConfigurer deviceAuthorizationEndpoint(
 			Customizer<OAuth2DeviceAuthorizationEndpointConfigurer> deviceAuthorizationEndpointCustomizer) {
 		deviceAuthorizationEndpointCustomizer
-			.customize(getConfigurer(OAuth2DeviceAuthorizationEndpointConfigurer.class));
+				.customize(getConfigurer(OAuth2DeviceAuthorizationEndpointConfigurer.class));
 		return this;
 	}
 
@@ -314,7 +327,7 @@ public final class OAuth2AuthorizationServerConfigurer
 	@Override
 	public void init(HttpSecurity httpSecurity) throws Exception {
 		AuthorizationServerSettings authorizationServerSettings = OAuth2ConfigurerUtils
-			.getAuthorizationServerSettings(httpSecurity);
+				.getAuthorizationServerSettings(httpSecurity);
 		validateAuthorizationServerSettings(authorizationServerSettings);
 
 		if (isOidcEnabled()) {
@@ -329,7 +342,7 @@ public final class OAuth2AuthorizationServerConfigurer
 						if (sessionRegistry.getSessionInformation(request.getSession().getId()) == null) {
 							sessionRegistry.registerNewSession(request.getSession().getId(),
 									((Authentication) authorizationCodeRequestAuthentication.getPrincipal())
-										.getPrincipal());
+											.getPrincipal());
 						}
 					}
 				}
@@ -341,7 +354,7 @@ public final class OAuth2AuthorizationServerConfigurer
 			Consumer<OAuth2AuthorizationCodeRequestAuthenticationContext> oidcAuthenticationRequestValidator = (
 					authenticationContext) -> {
 				OAuth2AuthorizationCodeRequestAuthenticationToken authorizationCodeRequestAuthentication = authenticationContext
-					.getAuthentication();
+						.getAuthentication();
 				if (authorizationCodeRequestAuthentication.getScopes().contains(OidcScopes.OPENID)) {
 					OAuth2Error error = new OAuth2Error(OAuth2ErrorCodes.INVALID_SCOPE,
 							"OpenID Connect 1.0 authentication requests are restricted.",
@@ -353,12 +366,12 @@ public final class OAuth2AuthorizationServerConfigurer
 			OAuth2AuthorizationEndpointConfigurer authorizationEndpointConfigurer = getConfigurer(
 					OAuth2AuthorizationEndpointConfigurer.class);
 			authorizationEndpointConfigurer
-				.addAuthorizationCodeRequestAuthenticationValidator(oidcAuthenticationRequestValidator);
+					.addAuthorizationCodeRequestAuthenticationValidator(oidcAuthenticationRequestValidator);
 			OAuth2PushedAuthorizationRequestEndpointConfigurer pushedAuthorizationRequestEndpointConfigurer = getConfigurer(
 					OAuth2PushedAuthorizationRequestEndpointConfigurer.class);
 			if (pushedAuthorizationRequestEndpointConfigurer != null) {
 				pushedAuthorizationRequestEndpointConfigurer
-					.addAuthorizationCodeRequestAuthenticationValidator(oidcAuthenticationRequestValidator);
+						.addAuthorizationCodeRequestAuthenticationValidator(oidcAuthenticationRequestValidator);
 			}
 		}
 
@@ -374,7 +387,7 @@ public final class OAuth2AuthorizationServerConfigurer
 		this.endpointsMatcher = new OrRequestMatcher(requestMatchers);
 
 		ExceptionHandlingConfigurer<HttpSecurity> exceptionHandling = httpSecurity
-			.getConfigurer(ExceptionHandlingConfigurer.class);
+				.getConfigurer(ExceptionHandlingConfigurer.class);
 		if (exceptionHandling != null) {
 			List<RequestMatcher> preferredMatchers = new ArrayList<>();
 			preferredMatchers.add(getRequestMatcher(OAuth2TokenEndpointConfigurer.class));
@@ -397,9 +410,9 @@ public final class OAuth2AuthorizationServerConfigurer
 			if (oidcConfigurer.getConfigurer(OidcUserInfoEndpointConfigurer.class) != null
 					|| oidcConfigurer.getConfigurer(OidcClientRegistrationEndpointConfigurer.class) != null) {
 				httpSecurity
-					// Accept access tokens for User Info and/or Client Registration
-					.oauth2ResourceServer(
-							(oauth2ResourceServer) -> oauth2ResourceServer.jwt(Customizer.withDefaults()));
+						// Accept access tokens for User Info and/or Client Registration
+						.oauth2ResourceServer(
+								(oauth2ResourceServer) -> oauth2ResourceServer.jwt(Customizer.withDefaults()));
 
 			}
 		}
@@ -410,7 +423,7 @@ public final class OAuth2AuthorizationServerConfigurer
 		this.configurers.values().forEach((configurer) -> configurer.configure(httpSecurity));
 
 		AuthorizationServerSettings authorizationServerSettings = OAuth2ConfigurerUtils
-			.getAuthorizationServerSettings(httpSecurity);
+				.getAuthorizationServerSettings(httpSecurity);
 
 		AuthorizationServerContextFilter authorizationServerContextFilter = new AuthorizationServerContextFilter(
 				authorizationServerSettings);
@@ -443,6 +456,8 @@ public final class OAuth2AuthorizationServerConfigurer
 		configurers.put(OAuth2TokenEndpointConfigurer.class, new OAuth2TokenEndpointConfigurer(this::postProcess));
 		configurers.put(OAuth2TokenIntrospectionEndpointConfigurer.class,
 				new OAuth2TokenIntrospectionEndpointConfigurer(this::postProcess));
+		configurers.put(OAuth2TokenStatusEndpointConfigurer.class,
+				new OAuth2TokenStatusEndpointConfigurer(this::postProcess));
 		configurers.put(OAuth2TokenRevocationEndpointConfigurer.class,
 				new OAuth2TokenRevocationEndpointConfigurer(this::postProcess));
 		configurers.put(OAuth2DeviceAuthorizationEndpointConfigurer.class,
@@ -495,7 +510,7 @@ public final class OAuth2AuthorizationServerConfigurer
 	private static void registerDelegateApplicationListener(HttpSecurity httpSecurity,
 			ApplicationListener<?> delegate) {
 		DelegatingApplicationListener delegatingApplicationListener = OAuth2ConfigurerUtils
-			.getOptionalBean(httpSecurity, DelegatingApplicationListener.class);
+				.getOptionalBean(httpSecurity, DelegatingApplicationListener.class);
 		if (delegatingApplicationListener == null) {
 			return;
 		}
