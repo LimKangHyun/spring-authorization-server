@@ -155,6 +155,12 @@ public final class ConfigurationSettingNames {
 			.concat("token-introspection-endpoint");
 
 		/**
+		 * Set the OAuth 2.0 Token Status endpoint.
+		 */
+		public static final String TOKEN_STATUS_ENDPOINT = AUTHORIZATION_SERVER_SETTINGS_NAMESPACE
+				.concat("token-status-endpoint");
+
+		/**
 		 * Set the OpenID Connect 1.0 Client Registration endpoint.
 		 */
 		public static final String OIDC_CLIENT_REGISTRATION_ENDPOINT = AUTHORIZATION_SERVER_SETTINGS_NAMESPACE
