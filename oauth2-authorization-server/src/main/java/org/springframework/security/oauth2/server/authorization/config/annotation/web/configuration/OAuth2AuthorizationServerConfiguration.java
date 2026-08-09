@@ -34,8 +34,11 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.DefaultOAuth2TokenCustomizers;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
+import org.springframework.security.oauth2.server.authorization.token.JwtEncodingContext;
+import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenCustomizer;
 import org.springframework.security.web.SecurityFilterChain;
 
 /**
@@ -85,6 +88,11 @@ public class OAuth2AuthorizationServerConfiguration {
 		postProcessor.addBeanDefinition(AuthorizationServerSettings.class,
 				() -> AuthorizationServerSettings.builder().build());
 		return postProcessor;
+	}
+
+	@Bean
+	OAuth2TokenCustomizer<JwtEncodingContext> jwtCustomizer() {
+		return DefaultOAuth2TokenCustomizers.jwtCustomizer();
 	}
 
 }
