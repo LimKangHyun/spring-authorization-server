@@ -38,6 +38,7 @@ import org.springframework.security.oauth2.server.authorization.authentication.X
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
 import org.springframework.security.oauth2.server.authorization.web.OAuth2ClientAuthenticationFilter;
+import org.springframework.security.oauth2.server.authorization.web.OAuth2ClientAuthenticationValidationFilter;
 import org.springframework.security.oauth2.server.authorization.web.authentication.ClientSecretBasicAuthenticationConverter;
 import org.springframework.security.oauth2.server.authorization.web.authentication.ClientSecretPostAuthenticationConverter;
 import org.springframework.security.oauth2.server.authorization.web.authentication.JwtClientAssertionAuthenticationConverter;
@@ -180,25 +181,25 @@ public final class OAuth2ClientAuthenticationConfigurer extends AbstractOAuth2Co
 	@Override
 	void init(HttpSecurity httpSecurity) {
 		AuthorizationServerSettings authorizationServerSettings = OAuth2ConfigurerUtils
-			.getAuthorizationServerSettings(httpSecurity);
+				.getAuthorizationServerSettings(httpSecurity);
 		String tokenEndpointUri = authorizationServerSettings.isMultipleIssuersAllowed()
 				? OAuth2ConfigurerUtils.withMultipleIssuersPattern(authorizationServerSettings.getTokenEndpoint())
 				: authorizationServerSettings.getTokenEndpoint();
 		String tokenIntrospectionEndpointUri = authorizationServerSettings.isMultipleIssuersAllowed()
 				? OAuth2ConfigurerUtils
-					.withMultipleIssuersPattern(authorizationServerSettings.getTokenIntrospectionEndpoint())
+				.withMultipleIssuersPattern(authorizationServerSettings.getTokenIntrospectionEndpoint())
 				: authorizationServerSettings.getTokenIntrospectionEndpoint();
 		String tokenRevocationEndpointUri = authorizationServerSettings.isMultipleIssuersAllowed()
 				? OAuth2ConfigurerUtils
-					.withMultipleIssuersPattern(authorizationServerSettings.getTokenRevocationEndpoint())
+				.withMultipleIssuersPattern(authorizationServerSettings.getTokenRevocationEndpoint())
 				: authorizationServerSettings.getTokenRevocationEndpoint();
 		String deviceAuthorizationEndpointUri = authorizationServerSettings.isMultipleIssuersAllowed()
 				? OAuth2ConfigurerUtils
-					.withMultipleIssuersPattern(authorizationServerSettings.getDeviceAuthorizationEndpoint())
+				.withMultipleIssuersPattern(authorizationServerSettings.getDeviceAuthorizationEndpoint())
 				: authorizationServerSettings.getDeviceAuthorizationEndpoint();
 		String pushedAuthorizationRequestEndpointUri = authorizationServerSettings.isMultipleIssuersAllowed()
 				? OAuth2ConfigurerUtils
-					.withMultipleIssuersPattern(authorizationServerSettings.getPushedAuthorizationRequestEndpoint())
+				.withMultipleIssuersPattern(authorizationServerSettings.getPushedAuthorizationRequestEndpoint())
 				: authorizationServerSettings.getPushedAuthorizationRequestEndpoint();
 		this.requestMatcher = new OrRequestMatcher(
 				PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.POST, tokenEndpointUri),
@@ -206,7 +207,7 @@ public final class OAuth2ClientAuthenticationConfigurer extends AbstractOAuth2Co
 				PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.POST, tokenRevocationEndpointUri),
 				PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.POST, deviceAuthorizationEndpointUri),
 				PathPatternRequestMatcher.withDefaults()
-					.matcher(HttpMethod.POST, pushedAuthorizationRequestEndpointUri));
+						.matcher(HttpMethod.POST, pushedAuthorizationRequestEndpointUri));
 		List<AuthenticationProvider> authenticationProviders = createDefaultAuthenticationProviders(httpSecurity);
 		if (!this.authenticationProviders.isEmpty()) {
 			authenticationProviders.addAll(0, this.authenticationProviders);
@@ -221,19 +222,24 @@ public final class OAuth2ClientAuthenticationConfigurer extends AbstractOAuth2Co
 		AuthenticationManager authenticationManager = httpSecurity.getSharedObject(AuthenticationManager.class);
 		OAuth2ClientAuthenticationFilter clientAuthenticationFilter = new OAuth2ClientAuthenticationFilter(
 				authenticationManager, this.requestMatcher);
+		OAuth2ClientAuthenticationValidationFilter validationFilter =
+				new OAuth2ClientAuthenticationValidationFilter(this.requestMatcher);
 		List<AuthenticationConverter> authenticationConverters = createDefaultAuthenticationConverters();
 		if (!this.authenticationConverters.isEmpty()) {
 			authenticationConverters.addAll(0, this.authenticationConverters);
 		}
 		this.authenticationConvertersConsumer.accept(authenticationConverters);
 		clientAuthenticationFilter
-			.setAuthenticationConverter(new DelegatingAuthenticationConverter(authenticationConverters));
+				.setAuthenticationConverter(new DelegatingAuthenticationConverter(authenticationConverters));
 		if (this.authenticationSuccessHandler != null) {
 			clientAuthenticationFilter.setAuthenticationSuccessHandler(this.authenticationSuccessHandler);
 		}
 		if (this.errorResponseHandler != null) {
 			clientAuthenticationFilter.setAuthenticationFailureHandler(this.errorResponseHandler);
 		}
+		httpSecurity.addFilterAfter(postProcess(validationFilter),
+				AbstractPreAuthenticatedProcessingFilter.class
+		);
 		httpSecurity.addFilterAfter(postProcess(clientAuthenticationFilter),
 				AbstractPreAuthenticatedProcessingFilter.class);
 	}
@@ -259,7 +265,7 @@ public final class OAuth2ClientAuthenticationConfigurer extends AbstractOAuth2Co
 		List<AuthenticationProvider> authenticationProviders = new ArrayList<>();
 
 		RegisteredClientRepository registeredClientRepository = OAuth2ConfigurerUtils
-			.getRegisteredClientRepository(httpSecurity);
+				.getRegisteredClientRepository(httpSecurity);
 		OAuth2AuthorizationService authorizationService = OAuth2ConfigurerUtils.getAuthorizationService(httpSecurity);
 
 		JwtClientAssertionAuthenticationProvider jwtClientAssertionAuthenticationProvider = new JwtClientAssertionAuthenticationProvider(
