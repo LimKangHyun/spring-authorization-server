@@ -103,25 +103,25 @@ public final class OAuth2TokenExchangeAuthenticationProvider implements Authenti
 		OAuth2TokenExchangeAuthenticationToken tokenExchangeAuthentication = (OAuth2TokenExchangeAuthenticationToken) authentication;
 
 		OAuth2ClientAuthenticationToken clientPrincipal = OAuth2AuthenticationProviderUtils
-			.getAuthenticatedClientElseThrowInvalidClient(tokenExchangeAuthentication);
-		RegisteredClient registeredClient = clientPrincipal.getRegisteredClient();
+				.getAuthenticatedClientElseThrowInvalidClient(tokenExchangeAuthentication);
+
+		RegisteredClient registeredClient =
+				OAuth2AuthenticationProviderUtils.getRegisteredClient(
+						tokenExchangeAuthentication,
+						AuthorizationGrantType.TOKEN_EXCHANGE);
 
 		if (this.logger.isTraceEnabled()) {
 			this.logger.trace("Retrieved registered client");
 		}
 
-		if (!registeredClient.getAuthorizationGrantTypes().contains(AuthorizationGrantType.TOKEN_EXCHANGE)) {
-			throw new OAuth2AuthenticationException(OAuth2ErrorCodes.UNAUTHORIZED_CLIENT);
-		}
-
 		if (JWT_TOKEN_TYPE_VALUE.equals(tokenExchangeAuthentication.getRequestedTokenType())
 				&& !OAuth2TokenFormat.SELF_CONTAINED
-					.equals(registeredClient.getTokenSettings().getAccessTokenFormat())) {
+				.equals(registeredClient.getTokenSettings().getAccessTokenFormat())) {
 			throw new OAuth2AuthenticationException(OAuth2ErrorCodes.INVALID_REQUEST);
 		}
 
 		OAuth2Authorization subjectAuthorization = this.authorizationService
-			.findByToken(tokenExchangeAuthentication.getSubjectToken(), OAuth2TokenType.ACCESS_TOKEN);
+				.findByToken(tokenExchangeAuthentication.getSubjectToken(), OAuth2TokenType.ACCESS_TOKEN);
 		if (subjectAuthorization == null) {
 			throw new OAuth2AuthenticationException(OAuth2ErrorCodes.INVALID_GRANT);
 		}
@@ -131,7 +131,7 @@ public final class OAuth2TokenExchangeAuthenticationProvider implements Authenti
 		}
 
 		OAuth2Authorization.Token<OAuth2Token> subjectToken = subjectAuthorization
-			.getToken(tokenExchangeAuthentication.getSubjectToken());
+				.getToken(tokenExchangeAuthentication.getSubjectToken());
 		if (!subjectToken.isActive()) {
 			// As per https://tools.ietf.org/html/rfc6749#section-5.2
 			// invalid_grant: The provided authorization grant (e.g., authorization code,
@@ -173,7 +173,7 @@ public final class OAuth2TokenExchangeAuthenticationProvider implements Authenti
 			}
 
 			OAuth2Authorization.Token<OAuth2Token> actorToken = actorAuthorization
-				.getToken(tokenExchangeAuthentication.getActorToken());
+					.getToken(tokenExchangeAuthentication.getActorToken());
 			if (!actorToken.isActive()) {
 				// As per https://tools.ietf.org/html/rfc6749#section-5.2
 				// invalid_grant: The provided authorization grant (e.g., authorization

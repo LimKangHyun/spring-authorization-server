@@ -102,16 +102,21 @@ public final class OAuth2RefreshTokenAuthenticationProvider implements Authentic
 	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
 		OAuth2RefreshTokenAuthenticationToken refreshTokenAuthentication = (OAuth2RefreshTokenAuthenticationToken) authentication;
 
-		OAuth2ClientAuthenticationToken clientPrincipal = OAuth2AuthenticationProviderUtils
-			.getAuthenticatedClientElseThrowInvalidClient(refreshTokenAuthentication);
-		RegisteredClient registeredClient = clientPrincipal.getRegisteredClient();
+		OAuth2ClientAuthenticationToken clientPrincipal =
+				OAuth2AuthenticationProviderUtils
+						.getAuthenticatedClientElseThrowInvalidClient(refreshTokenAuthentication);
+
+		RegisteredClient registeredClient =
+				OAuth2AuthenticationProviderUtils.getRegisteredClient(
+						refreshTokenAuthentication,
+						AuthorizationGrantType.REFRESH_TOKEN);
 
 		if (this.logger.isTraceEnabled()) {
 			this.logger.trace("Retrieved registered client");
 		}
 
 		OAuth2Authorization authorization = this.authorizationService
-			.findByToken(refreshTokenAuthentication.getRefreshToken(), OAuth2TokenType.REFRESH_TOKEN);
+				.findByToken(refreshTokenAuthentication.getRefreshToken(), OAuth2TokenType.REFRESH_TOKEN);
 		if (authorization == null) {
 			if (this.logger.isDebugEnabled()) {
 				this.logger.debug("Invalid request: refresh_token is invalid");
@@ -125,15 +130,6 @@ public final class OAuth2RefreshTokenAuthenticationProvider implements Authentic
 
 		if (!registeredClient.getId().equals(authorization.getRegisteredClientId())) {
 			throw new OAuth2AuthenticationException(OAuth2ErrorCodes.INVALID_GRANT);
-		}
-
-		if (!registeredClient.getAuthorizationGrantTypes().contains(AuthorizationGrantType.REFRESH_TOKEN)) {
-			if (this.logger.isDebugEnabled()) {
-				this.logger.debug(LogMessage.format(
-						"Invalid request: requested grant_type is not allowed" + " for registered client '%s'",
-						registeredClient.getId()));
-			}
-			throw new OAuth2AuthenticationException(OAuth2ErrorCodes.UNAUTHORIZED_CLIENT);
 		}
 
 		OAuth2Authorization.Token<OAuth2RefreshToken> refreshToken = authorization.getRefreshToken();
