@@ -173,17 +173,17 @@ public final class AuthorizationServerSettings extends AbstractSettings {
 	 */
 	public static Builder builder() {
 		return new Builder().multipleIssuersAllowed(false)
-			.authorizationEndpoint("/oauth2/authorize")
-			.pushedAuthorizationRequestEndpoint("/oauth2/par")
-			.deviceAuthorizationEndpoint("/oauth2/device_authorization")
-			.deviceVerificationEndpoint("/oauth2/device_verification")
-			.tokenEndpoint("/oauth2/token")
-			.jwkSetEndpoint("/oauth2/jwks")
-			.tokenRevocationEndpoint("/oauth2/revoke")
-			.tokenIntrospectionEndpoint("/oauth2/introspect")
-			.oidcClientRegistrationEndpoint("/connect/register")
-			.oidcUserInfoEndpoint("/userinfo")
-			.oidcLogoutEndpoint("/connect/logout");
+				.authorizationEndpoint("/oauth2/authorize")
+				.pushedAuthorizationRequestEndpoint("/oauth2/par")
+				.deviceAuthorizationEndpoint("/oauth2/device_authorization")
+				.deviceVerificationEndpoint("/oauth2/device_verification")
+				.tokenEndpoint("/oauth2/token")
+				.jwkSetEndpoint("/oauth2/jwks")
+				.tokenRevocationEndpoint("/oauth2/revoke")
+				.tokenIntrospectionEndpoint("/oauth2/introspect")
+				.oidcClientRegistrationEndpoint("/connect/register")
+				.oidcUserInfoEndpoint("/userinfo")
+				.oidcLogoutEndpoint("/connect/logout");
 	}
 
 	/**
@@ -360,12 +360,30 @@ public final class AuthorizationServerSettings extends AbstractSettings {
 		@Override
 		public AuthorizationServerSettings build() {
 			AuthorizationServerSettings authorizationServerSettings = new AuthorizationServerSettings(getSettings());
+
 			if (authorizationServerSettings.getIssuer() != null
 					&& authorizationServerSettings.isMultipleIssuersAllowed()) {
 				throw new IllegalArgumentException("The issuer identifier (" + authorizationServerSettings.getIssuer()
 						+ ") cannot be set when isMultipleIssuersAllowed() is true.");
 			}
+
+			validateEndpoint(authorizationServerSettings.getAuthorizationEndpoint());
+			validateEndpoint(authorizationServerSettings.getPushedAuthorizationRequestEndpoint());
+			validateEndpoint(authorizationServerSettings.getDeviceAuthorizationEndpoint());
+			validateEndpoint(authorizationServerSettings.getDeviceVerificationEndpoint());
+			validateEndpoint(authorizationServerSettings.getTokenEndpoint());
+			validateEndpoint(authorizationServerSettings.getJwkSetEndpoint());
+			validateEndpoint(authorizationServerSettings.getTokenRevocationEndpoint());
+			validateEndpoint(authorizationServerSettings.getTokenIntrospectionEndpoint());
+			validateEndpoint(authorizationServerSettings.getOidcClientRegistrationEndpoint());
+			validateEndpoint(authorizationServerSettings.getOidcUserInfoEndpoint());
+			validateEndpoint(authorizationServerSettings.getOidcLogoutEndpoint());
+
 			return authorizationServerSettings;
+		}
+
+		private static void validateEndpoint(String endpoint) {
+			Assert.hasText(endpoint, "endpoint cannot be empty");
 		}
 
 	}
