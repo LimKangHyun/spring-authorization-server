@@ -72,7 +72,7 @@ public final class OAuth2AccessTokenGenerator implements OAuth2TokenGenerator<OA
 		RegisteredClient registeredClient = context.getRegisteredClient();
 
 		Instant issuedAt = Instant.now();
-		Instant expiresAt = issuedAt.plus(registeredClient.getTokenSettings().getAccessTokenTimeToLive());
+		Instant expiresAt = issuedAt.plus(registeredClient.getTokenSettings().getAccessTokenLifetime());
 
 		// @formatter:off
 		OAuth2TokenClaimsSet.Builder claimsBuilder = OAuth2TokenClaimsSet.builder();
