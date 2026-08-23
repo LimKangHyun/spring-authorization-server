@@ -115,7 +115,7 @@ public final class OAuth2AccessTokenGenerator implements OAuth2TokenGenerator<OA
 			// @formatter:on
 
 			OAuth2TokenClaimsContext accessTokenContext = accessTokenContextBuilder.build();
-			this.accessTokenCustomizer.customize(accessTokenContext);
+			this.accessTokenCustomizer.customize(accessTokenContext, context.getTokenType());
 		}
 
 		OAuth2TokenClaimsSet accessTokenClaimsSet = claimsBuilder.build();
