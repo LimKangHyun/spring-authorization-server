@@ -105,7 +105,7 @@ public final class JwtGenerator implements OAuth2TokenGenerator<Jwt> {
 			}
 		}
 		else {
-			expiresAt = issuedAt.plus(registeredClient.getTokenSettings().getAccessTokenTimeToLive());
+			expiresAt = issuedAt.plus(registeredClient.getTokenSettings().getAccessTokenLifetime());
 		}
 
 		// @formatter:off
