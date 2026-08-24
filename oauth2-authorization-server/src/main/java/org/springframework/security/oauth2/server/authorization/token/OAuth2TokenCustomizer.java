@@ -15,6 +15,8 @@
  */
 package org.springframework.security.oauth2.server.authorization.token;
 
+import org.springframework.security.oauth2.server.authorization.OAuth2TokenType;
+
 /**
  * Implementations of this interface are responsible for customizing the OAuth 2.0 Token
  * attributes contained within the {@link OAuth2TokenContext}.
@@ -30,7 +32,8 @@ public interface OAuth2TokenCustomizer<T extends OAuth2TokenContext> {
 	/**
 	 * Customize the OAuth 2.0 Token attributes.
 	 * @param context the context containing the OAuth 2.0 Token attributes
+	 * @param tokenType the type of token being customized
 	 */
-	void customize(T context);
+	void customize(T context, OAuth2TokenType tokenType);
 
 }
