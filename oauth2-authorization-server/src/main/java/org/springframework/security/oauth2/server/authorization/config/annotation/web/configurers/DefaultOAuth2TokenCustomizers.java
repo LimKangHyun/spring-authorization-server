@@ -46,12 +46,12 @@ import org.springframework.util.CollectionUtils;
  * @author Steve Riesenberg
  * @since 1.3
  */
-final class DefaultOAuth2TokenCustomizers {
+public final class DefaultOAuth2TokenCustomizers {
 
 	private DefaultOAuth2TokenCustomizers() {
 	}
 
-	static OAuth2TokenCustomizer<JwtEncodingContext> jwtCustomizer() {
+	public static OAuth2TokenCustomizer<JwtEncodingContext> jwtCustomizer() {
 		return (context) -> context.getClaims().claims((claims) -> customize(context, claims));
 	}
 
@@ -65,11 +65,11 @@ final class DefaultOAuth2TokenCustomizers {
 		// Add 'cnf' claim for Mutual-TLS Client Certificate-Bound Access Tokens
 		if (OAuth2TokenType.ACCESS_TOKEN.equals(tokenContext.getTokenType())
 				&& tokenContext.getAuthorizationGrant() != null && tokenContext.getAuthorizationGrant()
-					.getPrincipal() instanceof OAuth2ClientAuthenticationToken clientAuthentication) {
+				.getPrincipal() instanceof OAuth2ClientAuthenticationToken clientAuthentication) {
 
 			if ((ClientAuthenticationMethod.TLS_CLIENT_AUTH.equals(clientAuthentication.getClientAuthenticationMethod())
 					|| ClientAuthenticationMethod.SELF_SIGNED_TLS_CLIENT_AUTH
-						.equals(clientAuthentication.getClientAuthenticationMethod()))
+					.equals(clientAuthentication.getClientAuthenticationMethod()))
 					&& tokenContext.getRegisteredClient().getTokenSettings().isX509CertificateBoundAccessTokens()) {
 
 				X509Certificate[] clientCertificateChain = (X509Certificate[]) clientAuthentication.getCredentials();
@@ -119,13 +119,14 @@ final class DefaultOAuth2TokenCustomizers {
 
 		if (!CollectionUtils.isEmpty(cnfClaims)) {
 			claims.put("cnf", cnfClaims);
+			claims.put("custom_claim", "custom_value");
 		}
 
 		// Add 'act' claim for delegation use case of Token Exchange Grant.
 		// If more than one actor is present, we create a chain of delegation by nesting
 		// "act" claims.
 		if (tokenContext
-			.getPrincipal() instanceof OAuth2TokenExchangeCompositeAuthenticationToken compositeAuthenticationToken) {
+				.getPrincipal() instanceof OAuth2TokenExchangeCompositeAuthenticationToken compositeAuthenticationToken) {
 			Map<String, Object> currentClaims = claims;
 			for (OAuth2TokenExchangeActor actor : compositeAuthenticationToken.getActors()) {
 				Map<String, Object> actorClaims = actor.getClaims();
