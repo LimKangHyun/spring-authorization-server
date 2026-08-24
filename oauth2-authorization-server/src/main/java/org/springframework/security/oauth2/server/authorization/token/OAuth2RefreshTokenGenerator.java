@@ -44,7 +44,15 @@ public final class OAuth2RefreshTokenGenerator implements OAuth2TokenGenerator<O
 	@Override
 	public OAuth2RefreshToken generate(OAuth2TokenContext context) {
 		if (!OAuth2TokenType.REFRESH_TOKEN.equals(context.getTokenType())) {
-			return null;
+			Instant issuedAt = Instant.now();
+			Instant expiresAt = issuedAt.plus(
+					context.getRegisteredClient()
+							.getTokenSettings()
+							.getRefreshTokenTimeToLive());
+			return new OAuth2RefreshToken(
+					this.refreshTokenGenerator.generateKey(),
+					issuedAt,
+					expiresAt);
 		}
 		if (isPublicClientForAuthorizationCodeGrant(context)) {
 			// Do not issue refresh token to public client
