@@ -53,7 +53,7 @@ public final class ConfigurationSettingNames {
 		 * {@code authorization_code} and {@code device_code}).
 		 */
 		public static final String REQUIRE_AUTHORIZATION_CONSENT = CLIENT_SETTINGS_NAMESPACE
-			.concat("require-authorization-consent");
+				.concat("require-authorization-consent");
 
 		/**
 		 * Set the {@code URL} for the Client's JSON Web Key Set.
@@ -70,7 +70,7 @@ public final class ConfigurationSettingNames {
 		 * @since 0.2.2
 		 */
 		public static final String TOKEN_ENDPOINT_AUTHENTICATION_SIGNING_ALGORITHM = CLIENT_SETTINGS_NAMESPACE
-			.concat("token-endpoint-authentication-signing-algorithm");
+				.concat("token-endpoint-authentication-signing-algorithm");
 
 		/**
 		 * Set the expected subject distinguished name associated to the client
@@ -79,7 +79,7 @@ public final class ConfigurationSettingNames {
 		 * @since 1.3
 		 */
 		public static final String X509_CERTIFICATE_SUBJECT_DN = CLIENT_SETTINGS_NAMESPACE
-			.concat("x509-certificate-subject-dn");
+				.concat("x509-certificate-subject-dn");
 
 		private Client() {
 		}
@@ -92,7 +92,7 @@ public final class ConfigurationSettingNames {
 	public static final class AuthorizationServer {
 
 		private static final String AUTHORIZATION_SERVER_SETTINGS_NAMESPACE = SETTINGS_NAMESPACE
-			.concat("authorization-server.");
+				.concat("authorization-server.");
 
 		/**
 		 * Set the URL the Authorization Server uses as its Issuer Identifier.
@@ -104,32 +104,32 @@ public final class ConfigurationSettingNames {
 		 * @since 1.3
 		 */
 		public static final String MULTIPLE_ISSUERS_ALLOWED = AUTHORIZATION_SERVER_SETTINGS_NAMESPACE
-			.concat("multiple-issuers-allowed");
+				.concat("multiple-issuers-allowed");
 
 		/**
 		 * Set the OAuth 2.0 Authorization endpoint.
 		 */
 		public static final String AUTHORIZATION_ENDPOINT = AUTHORIZATION_SERVER_SETTINGS_NAMESPACE
-			.concat("authorization-endpoint");
+				.concat("authorization-endpoint");
 
 		/**
 		 * Set the OAuth 2.0 Pushed Authorization Request endpoint.
 		 * @since 1.5
 		 */
 		public static final String PUSHED_AUTHORIZATION_REQUEST_ENDPOINT = AUTHORIZATION_SERVER_SETTINGS_NAMESPACE
-			.concat("pushed-authorization-request-endpoint");
+				.concat("pushed-authorization-request-endpoint");
 
 		/**
 		 * Set the OAuth 2.0 Device Authorization endpoint.
 		 */
 		public static final String DEVICE_AUTHORIZATION_ENDPOINT = AUTHORIZATION_SERVER_SETTINGS_NAMESPACE
-			.concat("device-authorization-endpoint");
+				.concat("device-authorization-endpoint");
 
 		/**
 		 * Set the OAuth 2.0 Device Verification endpoint.
 		 */
 		public static final String DEVICE_VERIFICATION_ENDPOINT = AUTHORIZATION_SERVER_SETTINGS_NAMESPACE
-			.concat("device-verification-endpoint");
+				.concat("device-verification-endpoint");
 
 		/**
 		 * Set the OAuth 2.0 Token endpoint.
@@ -140,38 +140,44 @@ public final class ConfigurationSettingNames {
 		 * Set the JWK Set endpoint.
 		 */
 		public static final String JWK_SET_ENDPOINT = AUTHORIZATION_SERVER_SETTINGS_NAMESPACE
-			.concat("jwk-set-endpoint");
+				.concat("jwk-set-endpoint");
 
 		/**
 		 * Set the OAuth 2.0 Token Revocation endpoint.
 		 */
 		public static final String TOKEN_REVOCATION_ENDPOINT = AUTHORIZATION_SERVER_SETTINGS_NAMESPACE
-			.concat("token-revocation-endpoint");
+				.concat("token-revocation-endpoint");
 
 		/**
 		 * Set the OAuth 2.0 Token Introspection endpoint.
 		 */
 		public static final String TOKEN_INTROSPECTION_ENDPOINT = AUTHORIZATION_SERVER_SETTINGS_NAMESPACE
-			.concat("token-introspection-endpoint");
+				.concat("token-introspection-endpoint");
+
+		/**
+		 * Set the OAuth 2.0 Token Status endpoint.
+		 */
+		public static final String TOKEN_STATUS_ENDPOINT = AUTHORIZATION_SERVER_SETTINGS_NAMESPACE
+				.concat("token-status-endpoint");
 
 		/**
 		 * Set the OpenID Connect 1.0 Client Registration endpoint.
 		 */
 		public static final String OIDC_CLIENT_REGISTRATION_ENDPOINT = AUTHORIZATION_SERVER_SETTINGS_NAMESPACE
-			.concat("oidc-client-registration-endpoint");
+				.concat("oidc-client-registration-endpoint");
 
 		/**
 		 * Set the OpenID Connect 1.0 UserInfo endpoint.
 		 */
 		public static final String OIDC_USER_INFO_ENDPOINT = AUTHORIZATION_SERVER_SETTINGS_NAMESPACE
-			.concat("oidc-user-info-endpoint");
+				.concat("oidc-user-info-endpoint");
 
 		/**
 		 * Set the OpenID Connect 1.0 Logout endpoint.
 		 * @since 1.1
 		 */
 		public static final String OIDC_LOGOUT_ENDPOINT = AUTHORIZATION_SERVER_SETTINGS_NAMESPACE
-			.concat("oidc-logout-endpoint");
+				.concat("oidc-logout-endpoint");
 
 		private AuthorizationServer() {
 		}
@@ -190,13 +196,13 @@ public final class ConfigurationSettingNames {
 		 * @since 0.4.0
 		 */
 		public static final String AUTHORIZATION_CODE_TIME_TO_LIVE = TOKEN_SETTINGS_NAMESPACE
-			.concat("authorization-code-time-to-live");
+				.concat("authorization-code-time-to-live");
 
 		/**
 		 * Set the time-to-live for an access token.
 		 */
 		public static final String ACCESS_TOKEN_TIME_TO_LIVE = TOKEN_SETTINGS_NAMESPACE
-			.concat("access-token-time-to-live");
+				.concat("access-token-time-to-live");
 
 		/**
 		 * Set the {@link OAuth2TokenFormat token format} for an access token.
@@ -209,7 +215,7 @@ public final class ConfigurationSettingNames {
 		 * @since 1.1
 		 */
 		public static final String DEVICE_CODE_TIME_TO_LIVE = TOKEN_SETTINGS_NAMESPACE
-			.concat("device-code-time-to-live");
+				.concat("device-code-time-to-live");
 
 		/**
 		 * Set to {@code true} if refresh tokens are reused when returning the access
@@ -221,14 +227,14 @@ public final class ConfigurationSettingNames {
 		 * Set the time-to-live for a refresh token.
 		 */
 		public static final String REFRESH_TOKEN_TIME_TO_LIVE = TOKEN_SETTINGS_NAMESPACE
-			.concat("refresh-token-time-to-live");
+				.concat("refresh-token-time-to-live");
 
 		/**
 		 * Set the {@link SignatureAlgorithm JWS} algorithm for signing the
 		 * {@link OidcIdToken ID Token}.
 		 */
 		public static final String ID_TOKEN_SIGNATURE_ALGORITHM = TOKEN_SETTINGS_NAMESPACE
-			.concat("id-token-signature-algorithm");
+				.concat("id-token-signature-algorithm");
 
 		/**
 		 * Set to {@code true} if access tokens must be bound to the client
@@ -237,7 +243,7 @@ public final class ConfigurationSettingNames {
 		 * @since 1.3
 		 */
 		public static final String X509_CERTIFICATE_BOUND_ACCESS_TOKENS = TOKEN_SETTINGS_NAMESPACE
-			.concat("x509-certificate-bound-access-tokens");
+				.concat("x509-certificate-bound-access-tokens");
 
 		private Token() {
 		}
