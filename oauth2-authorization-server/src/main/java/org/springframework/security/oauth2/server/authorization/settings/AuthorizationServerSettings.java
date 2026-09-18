@@ -141,6 +141,15 @@ public final class AuthorizationServerSettings extends AbstractSettings {
 	}
 
 	/**
+	 * Returns the OAuth 2.0 Token Status endpoint. The default is
+	 * {@code /oauth2/token-status}.
+	 * @return the Token Status endpoint
+	 */
+	public String getTokenStatusEndpoint() {
+		return getSetting(ConfigurationSettingNames.AuthorizationServer.TOKEN_STATUS_ENDPOINT);
+	}
+
+	/**
 	 * Returns the OpenID Connect 1.0 Client Registration endpoint. The default is
 	 * {@code /connect/register}.
 	 * @return the OpenID Connect 1.0 Client Registration endpoint
@@ -173,17 +182,18 @@ public final class AuthorizationServerSettings extends AbstractSettings {
 	 */
 	public static Builder builder() {
 		return new Builder().multipleIssuersAllowed(false)
-			.authorizationEndpoint("/oauth2/authorize")
-			.pushedAuthorizationRequestEndpoint("/oauth2/par")
-			.deviceAuthorizationEndpoint("/oauth2/device_authorization")
-			.deviceVerificationEndpoint("/oauth2/device_verification")
-			.tokenEndpoint("/oauth2/token")
-			.jwkSetEndpoint("/oauth2/jwks")
-			.tokenRevocationEndpoint("/oauth2/revoke")
-			.tokenIntrospectionEndpoint("/oauth2/introspect")
-			.oidcClientRegistrationEndpoint("/connect/register")
-			.oidcUserInfoEndpoint("/userinfo")
-			.oidcLogoutEndpoint("/connect/logout");
+				.authorizationEndpoint("/oauth2/authorize")
+				.pushedAuthorizationRequestEndpoint("/oauth2/par")
+				.deviceAuthorizationEndpoint("/oauth2/device_authorization")
+				.deviceVerificationEndpoint("/oauth2/device_verification")
+				.tokenEndpoint("/oauth2/token")
+				.jwkSetEndpoint("/oauth2/jwks")
+				.tokenRevocationEndpoint("/oauth2/revoke")
+				.tokenStatusEndpoint("/oauth2/token-status")
+				.tokenIntrospectionEndpoint("/oauth2/introspect")
+				.oidcClientRegistrationEndpoint("/connect/register")
+				.oidcUserInfoEndpoint("/userinfo")
+				.oidcLogoutEndpoint("/connect/logout");
 	}
 
 	/**
@@ -321,6 +331,16 @@ public final class AuthorizationServerSettings extends AbstractSettings {
 		public Builder tokenIntrospectionEndpoint(String tokenIntrospectionEndpoint) {
 			return setting(ConfigurationSettingNames.AuthorizationServer.TOKEN_INTROSPECTION_ENDPOINT,
 					tokenIntrospectionEndpoint);
+		}
+
+		/**
+		 * Sets the OAuth 2.0 Token Status endpoint.
+		 * @param tokenStatusEndpoint the Token Status endpoint
+		 * @return the {@link Builder} for further configuration
+		 */
+		public Builder tokenStatusEndpoint(String tokenStatusEndpoint) {
+			return setting(ConfigurationSettingNames.AuthorizationServer.TOKEN_STATUS_ENDPOINT,
+					tokenStatusEndpoint);
 		}
 
 		/**
